@@ -57,6 +57,8 @@ const useSelectionSort = (initialArray: number[], delay: number = 500) => {
   }, [sorted, stop]);
 
   useEffect(() => {
+    setSorted(false);
+    stop();
     setArray([...initialArray]);
     setCurrentIndices({
       i: 0,
@@ -64,9 +66,9 @@ const useSelectionSort = (initialArray: number[], delay: number = 500) => {
       min: 0,
     });
     iRef.current = 0;
-    jRef.current = 0;
+    jRef.current = 1;
     minRef.current = 0;
-  }, [initialArray]);
+  }, [initialArray, stop]);
 
   return {
     array,

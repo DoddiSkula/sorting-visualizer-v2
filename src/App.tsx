@@ -16,7 +16,7 @@ function App() {
     start,
     stop,
     isRunning,
-  } = useSelectionSort(array, 500 / arraySize);
+  } = useSelectionSort(array, 300 / arraySize);
 
   useEffect(() => {
     setArray(generateArray(arraySize));
@@ -41,6 +41,7 @@ function App() {
               const isCorrect =
                 value === index + 1 && index <= currentIndices.i;
               const isBeingEvaluated = index === currentIndices.i;
+              const isCurrentMin = index === currentIndices.min;
               const isInAction = index === currentIndices.j;
 
               return (
@@ -49,7 +50,7 @@ function App() {
                   value={value}
                   height={height}
                   isCorrect={isCorrect}
-                  isBeingEvaluated={isBeingEvaluated}
+                  isBeingEvaluated={isBeingEvaluated || isCurrentMin}
                   isInAction={isInAction}
                 />
               );
@@ -59,7 +60,7 @@ function App() {
 
         <div className="relative h-5 w-full">
           <div
-            className="absolute transition-all left-0 top-0 h-full flex items-center justify-center"
+            className="absolute transition-all duration-100 left-0 top-0 h-full flex items-center justify-center"
             style={{
               left: `${(currentIndices.i / arraySize) * 100}%`,
               width: `${(1 / arraySize) * 100}%`,
@@ -68,13 +69,13 @@ function App() {
             <ChevronUp className="size-5" />
           </div>
           <div
-            className="absolute left-0 top-0 h-full flex items-center justify-center opacity-50"
+            className="absolute transition-all duration-75 left-0 top-0 h-full flex items-center justify-center opacity-50"
             style={{
-              left: `${(currentIndices.j / arraySize) * 100}%`,
+              left: `${(currentIndices.min / arraySize) * 100}%`,
               width: `${(1 / arraySize) * 100}%`,
             }}
           >
-            <ChevronUp className="size-4" />
+            <ChevronUp className="size-5" />
           </div>
         </div>
       </section>
