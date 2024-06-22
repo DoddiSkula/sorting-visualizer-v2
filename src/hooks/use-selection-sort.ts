@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import usePlaybackControl from "./usePlaybackControl";
+import usePlaybackControl from "./use-playback-control";
 
 const useSelectionSort = (initialArray: number[], delay: number = 500) => {
   const [array, setArray] = useState<number[]>([...initialArray]);
@@ -8,7 +8,7 @@ const useSelectionSort = (initialArray: number[], delay: number = 500) => {
     j: number;
     min: number;
   }>({ i: 0, j: 1, min: 0 });
-  const [sorted, setSorted] = useState<boolean>(false);
+  const [isSorted, setIsSorted] = useState<boolean>(false);
 
   const iRef = useRef(0);
   const jRef = useRef(1);
@@ -21,7 +21,7 @@ const useSelectionSort = (initialArray: number[], delay: number = 500) => {
     const arr = [...array];
 
     if (i >= arr.length - 1) {
-      setSorted(true);
+      setIsSorted(true);
       return;
     }
 
@@ -47,18 +47,11 @@ const useSelectionSort = (initialArray: number[], delay: number = 500) => {
     });
   }, [array]);
 
-  const { isRunning, isPaused, start, stop, pause, resume } =
-    usePlaybackControl(sortStep, delay);
+  const { isRunning, start, stop, reset } = usePlaybackControl(sortStep, delay);
 
-  useEffect(() => {
-    if (sorted) {
-      stop();
-    }
-  }, [sorted, stop]);
-
-  useEffect(() => {
-    setSorted(false);
-    stop();
+  const resetVisualization = useCallback(() => {
+    reset();
+    setIsSorted(false);
     setArray([...initialArray]);
     setCurrentIndices({
       i: 0,
@@ -68,18 +61,28 @@ const useSelectionSort = (initialArray: number[], delay: number = 500) => {
     iRef.current = 0;
     jRef.current = 1;
     minRef.current = 0;
-  }, [initialArray, stop]);
+  }, [reset, initialArray]);
+
+  useEffect(() => {
+    if (isSorted) {
+      stop();
+    }
+  }, [isSorted, stop]);
+
+  useEffect(() => {
+    setIsSorted(false);
+    resetVisualization();
+    setArray([...initialArray]);
+  }, [initialArray, resetVisualization]);
 
   return {
     array,
     currentIndices,
     start,
     stop,
-    pause,
-    resume,
+    resetVisualization,
     isRunning,
-    isPaused,
-    sorted,
+    isSorted,
   };
 };
 
