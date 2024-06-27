@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { cn, generateArray } from "@/lib/utils";
-import useSelectionSort from "@/hooks/use-selection-sort";
 import { Bar } from "@/components/bar";
 import { Toolbar } from "@/components/toolbar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { IndexIndicator } from "./components/index-indicator";
+import useSorting from "./hooks/use-sorting";
 
 function App() {
   const [arraySize, setArraySize] = useState(50);
@@ -19,7 +19,7 @@ function App() {
     resetVisualization,
     isRunning,
     isSorted,
-  } = useSelectionSort(array, (5 / Number(speed)) * 10);
+  } = useSorting(array, (5 / Number(speed)) * 10);
 
   useEffect(() => {
     setArray(generateArray(arraySize));
@@ -31,6 +31,7 @@ function App() {
     <main className="dark:bg-neutral-900 h-screen w-full flex flex-col items-center justify-center dark:text-white overflow-hidden">
       <Toolbar
         isRunning={isRunning}
+        isSorted={isSorted}
         stop={stop}
         start={start}
         reset={resetVisualization}
@@ -55,32 +56,26 @@ function App() {
                   key={index}
                   value={value}
                   height={height}
-                  isCorrect={(isRunning && isCorrect) || isSorted}
-                  isBeingEvaluated={
-                    isRunning && (isBeingEvaluated || isCurrentMin)
-                  }
-                  isInAction={isRunning && isInAction}
+                  isCorrect={isCorrect || isSorted}
+                  isBeingEvaluated={isBeingEvaluated || isCurrentMin}
+                  isInAction={isInAction}
                 />
               );
             })}
           </div>
         </TooltipProvider>
         <div className="relative h-5 w-full">
-          {isRunning && (
-            <>
-              <IndexIndicator index={currentIndices.i} arraySize={arraySize} />
-              <IndexIndicator
-                index={currentIndices.min}
-                arraySize={arraySize}
-                className={"opacity-80 duration-75"}
-              />
-              <IndexIndicator
-                index={currentIndices.j}
-                arraySize={arraySize}
-                className={"opacity-50 transition-none"}
-              />
-            </>
-          )}
+          <IndexIndicator index={currentIndices.i} arraySize={arraySize} />
+          <IndexIndicator
+            index={currentIndices.min}
+            arraySize={arraySize}
+            className={"opacity-80 duration-75"}
+          />
+          <IndexIndicator
+            index={currentIndices.j}
+            arraySize={arraySize}
+            className={"opacity-50 transition-none"}
+          />
         </div>
       </section>
     </main>

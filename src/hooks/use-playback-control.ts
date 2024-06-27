@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 
-const usePlaybackControl = (callback: () => void, delay: number) => {
+const usePlaybackControl = (callback: (() => void) | null, delay: number) => {
   const [isRunning, setIsRunning] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -21,12 +21,13 @@ const usePlaybackControl = (callback: () => void, delay: number) => {
   }, [intervalRef, stop]);
 
   useEffect(() => {
-    if (isRunning) {
+    if (isRunning && callback !== null) {
       intervalRef.current = setInterval(callback, delay);
     } else if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
+
     return () => {
       if (intervalRef.current) {
         clearInterval(intervalRef.current);

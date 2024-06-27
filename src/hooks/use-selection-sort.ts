@@ -1,18 +1,27 @@
-import { useState, useRef, useEffect, useCallback } from "react";
-import usePlaybackControl from "./use-playback-control";
+import { useRef, useCallback, useEffect } from "react";
 
-const useSelectionSort = (initialArray: number[], delay: number = 500) => {
-  const [array, setArray] = useState<number[]>([...initialArray]);
-  const [currentIndices, setCurrentIndices] = useState<{
-    i: number;
-    j: number;
-    min: number;
-  }>({ i: 0, j: 1, min: 0 });
-  const [isSorted, setIsSorted] = useState<boolean>(false);
-
+const useSelectionSort = (
+  isSorted: boolean,
+  array: number[],
+  setArray: React.Dispatch<React.SetStateAction<number[]>>,
+  setIsSorted: React.Dispatch<React.SetStateAction<boolean>>,
+  setCurrentIndices: React.Dispatch<
+    React.SetStateAction<Record<string, number>>
+  >
+) => {
   const iRef = useRef(0);
   const jRef = useRef(1);
   const minRef = useRef(0);
+
+  const resetState = () => {
+    iRef.current = 0;
+    jRef.current = 1;
+    minRef.current = 0;
+  };
+
+  useEffect(() => {
+    if (!isSorted) resetState();
+  }, [isSorted]);
 
   const sortStep = useCallback(() => {
     const i = iRef.current;
@@ -45,45 +54,9 @@ const useSelectionSort = (initialArray: number[], delay: number = 500) => {
       j: jRef.current,
       min: minRef.current,
     });
-  }, [array]);
+  }, [array, setArray, setCurrentIndices, setIsSorted]);
 
-  const { isRunning, start, stop, reset } = usePlaybackControl(sortStep, delay);
-
-  const resetVisualization = useCallback(() => {
-    reset();
-    setIsSorted(false);
-    setArray([...initialArray]);
-    setCurrentIndices({
-      i: 0,
-      j: 0,
-      min: 0,
-    });
-    iRef.current = 0;
-    jRef.current = 1;
-    minRef.current = 0;
-  }, [reset, initialArray]);
-
-  useEffect(() => {
-    if (isSorted) {
-      stop();
-    }
-  }, [isSorted, stop]);
-
-  useEffect(() => {
-    setIsSorted(false);
-    resetVisualization();
-    setArray([...initialArray]);
-  }, [initialArray, resetVisualization]);
-
-  return {
-    array,
-    currentIndices,
-    start,
-    stop,
-    resetVisualization,
-    isRunning,
-    isSorted,
-  };
+  return sortStep;
 };
 
 export default useSelectionSort;

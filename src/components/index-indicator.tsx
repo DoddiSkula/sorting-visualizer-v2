@@ -12,6 +12,8 @@ export const IndexIndicator = ({
   arraySize,
   className,
 }: IndexIndicatorProps) => {
+  if (index === null || index === undefined) return null;
+
   return (
     <div
       className={cn(

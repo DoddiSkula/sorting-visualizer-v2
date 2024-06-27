@@ -1,4 +1,4 @@
-import { CirclePlayIcon, CircleStopIcon, RotateCcwIcon } from "lucide-react";
+import { CirclePauseIcon, CirclePlayIcon, RotateCcwIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import {
@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 
 interface ToolbarProps {
   isRunning: boolean;
+  isSorted: boolean;
   stop: () => void;
   start: () => void;
   reset: () => void;
@@ -27,6 +28,7 @@ interface ToolbarProps {
 
 export const Toolbar = ({
   isRunning,
+  isSorted,
   stop,
   start,
   reset,
@@ -39,16 +41,17 @@ export const Toolbar = ({
     <nav className="w-full overflow-hidden overflow-x-auto flex items-center flex-wrap divide-x divide-neutral-200 dark:divide-neutral-800 bg-neutral-50 dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 z-50">
       <div className="flex items-center gap-2 px-3 py-2">
         <Button
-          variant={isRunning ? "destructive" : "default"}
+          variant={isRunning ? "secondary" : "default"}
           onClick={isRunning ? stop : start}
           className={cn("w-[100px]")}
+          disabled={isSorted}
         >
           {isRunning ? (
-            <CircleStopIcon className="mr-2 size-5" />
+            <CirclePauseIcon className="mr-2 size-5" />
           ) : (
             <CirclePlayIcon className="mr-2 size-5" />
           )}
-          {isRunning ? "Stop" : "Start"}
+          {isRunning ? "Pause" : "Start"}
         </Button>
         <Button variant={"ghost"} onClick={reset}>
           <RotateCcwIcon className="mr-2 size-4" />
