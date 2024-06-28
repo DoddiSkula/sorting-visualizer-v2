@@ -2,32 +2,38 @@ import { useState, useCallback, useEffect } from "react";
 import usePlaybackControl from "./use-playback-control";
 import useSelectionSort from "./use-selection-sort";
 
-const useSorting = (initialArray: number[], delay: number = 500) => {
-  const [array, setArray] = useState<number[]>([...initialArray]);
-  const [currentIndices, setCurrentIndices] = useState<Record<string, number>>(
-    {}
-  );
-  const [isSorted, setIsSorted] = useState<boolean>(false);
+export interface Indicies {
+  highlights: number[];
+  evaluations: number[];
+}
 
-  const selectionSort = useSelectionSort(
-    isSorted,
+const useSorting = (initialArray: number[], delay: number) => {
+  const [isSorted, setIsSorted] = useState<boolean>(false);
+  const [array, setArray] = useState<number[]>([...initialArray]);
+  const [currentIndices, setCurrentIndices] = useState<Indicies>({
+    highlights: [],
+    evaluations: [],
+  });
+
+  const { sortStep, resetState } = useSelectionSort(
     array,
     setArray,
     setIsSorted,
     setCurrentIndices
   );
 
-  const { isRunning, start, stop, reset } = usePlaybackControl(
-    selectionSort,
-    delay
-  );
+  const { isRunning, start, stop, reset } = usePlaybackControl(sortStep, delay);
 
   const resetVisualization = useCallback(() => {
     reset();
+    resetState();
     setIsSorted(false);
     setArray([...initialArray]);
-    setCurrentIndices({});
-  }, [reset, initialArray]);
+    setCurrentIndices({
+      highlights: [],
+      evaluations: [],
+    });
+  }, [reset, resetState, initialArray]);
 
   useEffect(() => {
     if (isSorted) {

@@ -7,7 +7,7 @@ import { IndexIndicator } from "./components/index-indicator";
 import useSorting from "./hooks/use-sorting";
 
 function App() {
-  const [arraySize, setArraySize] = useState(50);
+  const [arraySize, setArraySize] = useState(30);
   const [array, setArray] = useState(generateArray(arraySize));
   const [speed, setSpeed] = useState("1");
 
@@ -19,7 +19,7 @@ function App() {
     resetVisualization,
     isRunning,
     isSorted,
-  } = useSorting(array, (5 / Number(speed)) * 10);
+  } = useSorting(array, 50);
 
   useEffect(() => {
     setArray(generateArray(arraySize));
@@ -43,39 +43,34 @@ function App() {
       <section className="w-full flex-1 flex flex-col gap-2 p-4">
         <TooltipProvider>
           <div className={cn("w-full flex-1 flex items-end gap-1")}>
-            {sortedArray.map((value, index) => {
-              const height = (value / maxValue) * 100;
-              const isCorrect =
-                value === index + 1 && index <= currentIndices.i;
-              const isBeingEvaluated = index === currentIndices.i;
-              const isCurrentMin = index === currentIndices.min;
-              const isInAction = index === currentIndices.j;
-
-              return (
-                <Bar
-                  key={index}
-                  value={value}
-                  height={height}
-                  isCorrect={isCorrect || isSorted}
-                  isBeingEvaluated={isBeingEvaluated || isCurrentMin}
-                  isInAction={isInAction}
-                />
-              );
-            })}
+            {sortedArray.map((value, index) => (
+              <Bar
+                key={value}
+                value={value}
+                height={(value / maxValue) * 100}
+                // isCorrect={(value === index + 1 && isRunning) || isSorted}
+                isEvaluated={currentIndices.evaluations.includes(index)}
+                isHighlighted={currentIndices.highlights.includes(index)}
+              />
+            ))}
           </div>
         </TooltipProvider>
         <div className="relative h-5 w-full">
-          <IndexIndicator index={currentIndices.i} arraySize={arraySize} />
-          <IndexIndicator
-            index={currentIndices.min}
-            arraySize={arraySize}
-            className={"opacity-80 duration-75"}
-          />
-          <IndexIndicator
-            index={currentIndices.j}
-            arraySize={arraySize}
-            className={"opacity-50 transition-none"}
-          />
+          <div>
+            {currentIndices.evaluations.map((value) => (
+              <IndexIndicator
+                key={value}
+                index={value}
+                arraySize={arraySize}
+                className={"opacity-50 transition-none"}
+              />
+            ))}
+          </div>
+          <div>
+            {currentIndices.highlights.map((value) => (
+              <IndexIndicator key={value} index={value} arraySize={arraySize} />
+            ))}
+          </div>
         </div>
       </section>
     </main>

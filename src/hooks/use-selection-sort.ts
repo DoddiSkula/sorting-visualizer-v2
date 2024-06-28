@@ -1,27 +1,21 @@
-import { useRef, useCallback, useEffect } from "react";
+import { useRef, useCallback } from "react";
+import { Indicies } from "./use-sorting";
 
 const useSelectionSort = (
-  isSorted: boolean,
   array: number[],
   setArray: React.Dispatch<React.SetStateAction<number[]>>,
   setIsSorted: React.Dispatch<React.SetStateAction<boolean>>,
-  setCurrentIndices: React.Dispatch<
-    React.SetStateAction<Record<string, number>>
-  >
+  setCurrentIndices: React.Dispatch<React.SetStateAction<Indicies>>
 ) => {
   const iRef = useRef(0);
   const jRef = useRef(1);
   const minRef = useRef(0);
 
-  const resetState = () => {
+  const resetState = useCallback(() => {
     iRef.current = 0;
     jRef.current = 1;
     minRef.current = 0;
-  };
-
-  useEffect(() => {
-    if (!isSorted) resetState();
-  }, [isSorted]);
+  }, []);
 
   const sortStep = useCallback(() => {
     const i = iRef.current;
@@ -50,13 +44,12 @@ const useSelectionSort = (
     }
 
     setCurrentIndices({
-      i: iRef.current,
-      j: jRef.current,
-      min: minRef.current,
+      highlights: [iRef.current, minRef.current],
+      evaluations: [jRef.current],
     });
   }, [array, setArray, setCurrentIndices, setIsSorted]);
 
-  return sortStep;
+  return { sortStep, resetState };
 };
 
 export default useSelectionSort;
