@@ -118,9 +118,9 @@ export const Toolbar = ({
           <Slider
             disabled={isRunning}
             value={[arraySize]}
-            min={10}
+            min={5}
             max={100}
-            step={1}
+            step={5}
             onValueChange={(value) => setArraySize(value[0])}
             className="w-[200px]"
           />

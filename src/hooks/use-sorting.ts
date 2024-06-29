@@ -1,62 +1,27 @@
-import { useState, useCallback, useEffect } from "react";
-import usePlaybackControl from "./use-playback-control";
-import useSelectionSort from "./use-selection-sort";
+import usePlayback from "@/hooks/use-playback";
+import { selectionSort } from "@/lib/selection-sort";
+import { useMemo } from "react";
 
-export interface Indicies {
-  highlights: number[];
-  evaluations: number[];
-}
+const useSorting = (initialArray: number[], fps: number = 120) => {
+  const sort = useMemo(() => selectionSort(initialArray), [initialArray]);
+  const playback = usePlayback(sort.snapshots.length, fps);
 
-const useSorting = (initialArray: number[], delay: number) => {
-  const [isSorted, setIsSorted] = useState<boolean>(false);
-  const [array, setArray] = useState<number[]>([...initialArray]);
-  const [currentIndices, setCurrentIndices] = useState<Indicies>({
-    highlights: [],
-    evaluations: [],
-  });
-
-  const { sortStep, resetState } = useSelectionSort(
-    array,
-    setArray,
-    setIsSorted,
-    setCurrentIndices
+  const arraySnapshot = useMemo(
+    () => sort.snapshots[playback.index] || [],
+    [playback.index, sort.snapshots]
   );
 
-  const { isRunning, start, stop, reset } = usePlaybackControl(sortStep, delay);
+  const evaluations = useMemo(
+    () => sort.indices.evaluations[playback.index] || [],
+    [playback.index, sort.indices.evaluations]
+  );
 
-  const resetVisualization = useCallback(() => {
-    reset();
-    resetState();
-    setIsSorted(false);
-    setArray([...initialArray]);
-    setCurrentIndices({
-      highlights: [],
-      evaluations: [],
-    });
-  }, [reset, resetState, initialArray]);
+  const highlights = useMemo(
+    () => sort.indices.highlights[playback.index] || [],
+    [playback.index, sort.indices.highlights]
+  );
 
-  useEffect(() => {
-    if (isSorted) {
-      stop();
-    }
-  }, [isSorted, stop]);
-
-  useEffect(() => {
-    resetVisualization();
-  }, [initialArray, resetVisualization]);
-
-  return {
-    array,
-    currentIndices,
-    isSorted,
-    isRunning,
-    start,
-    stop,
-    resetVisualization,
-    setArray,
-    setCurrentIndices,
-    setIsSorted,
-  };
+  return { sort, arraySnapshot, evaluations, highlights, playback };
 };
 
 export default useSorting;
