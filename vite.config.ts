@@ -9,5 +9,5 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
-  base: "/<REPO>/",
+  base: "/sorting-visualizer-v2/",
 });
