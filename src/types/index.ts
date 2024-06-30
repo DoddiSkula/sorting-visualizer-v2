@@ -1,5 +1,5 @@
-type SortReturn = {
+export type SortReturn = {
   array: number[];
   snapshots: number[][];
-  indices: { highlights: number[][]; evaluations: number[][] };
+  highlights: number[][];
 };

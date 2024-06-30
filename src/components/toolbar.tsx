@@ -13,6 +13,7 @@ import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { ModeToggle } from "@/components/mode-toggle";
 import React from "react";
 import { cn } from "@/lib/utils";
+import { sortOptions } from "@/data";
 
 interface ToolbarProps {
   isRunning: boolean;
@@ -24,6 +25,8 @@ interface ToolbarProps {
   setArraySize: React.Dispatch<number>;
   speed: string;
   setSpeed: React.Dispatch<string>;
+  selectedSort: string;
+  setSelectedSort: React.Dispatch<string>;
 }
 
 export const Toolbar = ({
@@ -36,6 +39,8 @@ export const Toolbar = ({
   setArraySize,
   speed,
   setSpeed,
+  selectedSort,
+  setSelectedSort,
 }: ToolbarProps) => {
   return (
     <nav className="w-full overflow-hidden overflow-x-auto flex items-center flex-wrap divide-x divide-neutral-200 dark:divide-neutral-800 bg-neutral-50 dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800 z-50">
@@ -97,22 +102,28 @@ export const Toolbar = ({
           </ToggleGroupItem>
         </ToggleGroup>
       </div>
-
       <div className="flex items-center gap-5 px-3 py-2">
         <div className="flex items-center w-fit gap-3">
           <p className="whitespace-nowrap font-medium text-sm">Algorithm</p>
-          <Select value="selection-sort" disabled={isRunning}>
+          <Select
+            value={selectedSort}
+            onValueChange={setSelectedSort}
+            disabled={isRunning}
+          >
             <SelectTrigger className="w-[180px]">
               <SelectValue placeholder="Select algorithm" />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
-                <SelectItem value="selection-sort">Selection sort</SelectItem>
+                {sortOptions.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
               </SelectGroup>
             </SelectContent>
           </Select>
         </div>
-
         <div className="flex items-center w-fit gap-3">
           <p className="whitespace-nowrap font-medium text-sm">Array size</p>
           <Slider
@@ -126,7 +137,6 @@ export const Toolbar = ({
           />
         </div>
       </div>
-
       <div className="px-3 py-2">
         <ModeToggle />
       </div>

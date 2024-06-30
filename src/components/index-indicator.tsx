@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { ChevronUp } from "lucide-react";
+import { Triangle } from "lucide-react";
 
 interface IndexIndicatorProps {
   index: number;
@@ -25,7 +25,10 @@ export const IndexIndicator = ({
         width: `${(1 / arraySize) * 100}%`,
       }}
     >
-      <ChevronUp className="size-5" />
+      <Triangle
+        className="size-5 fill-neutral-400/80 stroke-neutral-400 dark:fill-neutral-500/70 dark:stroke-neutral-500"
+        strokeWidth={1}
+      />
     </div>
   );
 };

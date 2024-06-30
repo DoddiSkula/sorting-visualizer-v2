@@ -1,16 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 
-type UsePlaybackReturn = {
-  index: number;
-  isPlaying: boolean;
-  isPaused: boolean;
-  start: () => void;
-  stop: () => void;
-  pause: () => void;
-  reset: () => void;
-};
-
-const usePlayback = (arraySize: number, fps: number): UsePlaybackReturn => {
+const usePlayback = (arraySize: number, fps: number) => {
   const [index, setIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
@@ -30,7 +20,7 @@ const usePlayback = (arraySize: number, fps: number): UsePlaybackReturn => {
     }
     setIsPlaying(false);
     setIsPaused(false);
-    setIndex(0); // Reset the index to 0 when stopping
+    setIndex(0);
   }, []);
 
   const pause = useCallback(() => {
@@ -57,7 +47,7 @@ const usePlayback = (arraySize: number, fps: number): UsePlaybackReturn => {
       const intervalId = setInterval(() => {
         setIndex((prevIndex) => {
           if (prevIndex >= arraySize - 1) {
-            stop(); // Stop the playback if index exceeds arraySize - 1
+            stop();
             return prevIndex;
           }
           return prevIndex + 1;

@@ -1,27 +1,35 @@
+import { sortOptions } from "@/data";
 import usePlayback from "@/hooks/use-playback";
-import { selectionSort } from "@/lib/selection-sort";
 import { useMemo } from "react";
 
-const useSorting = (initialArray: number[], fps: number = 120) => {
-  const sort = useMemo(() => selectionSort(initialArray), [initialArray]);
-  const playback = usePlayback(sort.snapshots.length, fps);
+const useSorting = (
+  initialArray: number[],
+  selectedSort: string,
+  speedMultiplier: number
+) => {
+  const sort = useMemo(() => {
+    const sortFn = sortOptions.find(
+      (option) => option.value === selectedSort
+    )?.sortFn;
+    if (sortFn) return sortFn(initialArray);
+  }, [initialArray, selectedSort]);
 
-  const arraySnapshot = useMemo(
-    () => sort.snapshots[playback.index] || [],
-    [playback.index, sort.snapshots]
+  const playback = usePlayback(
+    sort ? sort?.snapshots?.length : 0,
+    30 * speedMultiplier
   );
 
-  const evaluations = useMemo(
-    () => sort.indices.evaluations[playback.index] || [],
-    [playback.index, sort.indices.evaluations]
+  const arraySnapshot = useMemo(
+    () => sort?.snapshots[playback.index] || [],
+    [playback.index, sort]
   );
 
   const highlights = useMemo(
-    () => sort.indices.highlights[playback.index] || [],
-    [playback.index, sort.indices.highlights]
+    () => sort?.highlights[playback.index] || [],
+    [playback.index, sort]
   );
 
-  return { sort, arraySnapshot, evaluations, highlights, playback };
+  return { sort, arraySnapshot, highlights, playback };
 };
 
 export default useSorting;

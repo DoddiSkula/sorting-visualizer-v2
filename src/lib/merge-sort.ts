@@ -1,32 +1,63 @@
-export function mergeSort(array: number[]): number[] {
-  if (array.length <= 1) return array.slice();
+import { SortReturn } from "@/types";
 
-  const midIndex = Math.floor(array.length / 2);
-  const left = array.slice(0, midIndex);
-  const right = array.slice(midIndex, array.length);
+export const mergeSort = (initialArray: number[]): SortReturn => {
+  const array = [...initialArray];
+  const snapshots: number[][] = [];
+  const highlights: number[][] = [];
 
-  return merge(mergeSort(left), mergeSort(right));
-}
+  const mergeSortHelper = (left: number, right: number): number[] => {
+    if (left === right) return [array[left]];
 
-function merge(left: number[], right: number[]): number[] {
-  const result = Array<number>(left.length + right.length);
-  let curIndex = 0;
-  let leftIndex = 0;
-  let rightIndex = 0;
+    const mid = Math.floor((left + right) / 2);
 
-  while (leftIndex < left.length && rightIndex < right.length) {
-    if (left[leftIndex] < right[rightIndex]) {
-      result[curIndex++] = left[leftIndex++];
-    } else {
-      result[curIndex++] = right[rightIndex++];
+    const leftArray = mergeSortHelper(left, mid);
+    const rightArray = mergeSortHelper(mid + 1, right);
+
+    return merge(leftArray, rightArray, left);
+  };
+
+  const merge = (
+    leftArray: number[],
+    rightArray: number[],
+    left: number
+  ): number[] => {
+    const result: number[] = [];
+    let leftIndex = 0;
+    let rightIndex = 0;
+    let curIndex = left;
+
+    while (leftIndex < leftArray.length && rightIndex < rightArray.length) {
+      if (leftArray[leftIndex] < rightArray[rightIndex]) {
+        array[curIndex] = leftArray[leftIndex++];
+      } else {
+        array[curIndex] = rightArray[rightIndex++];
+      }
+      result.push(array[curIndex]);
+      highlights.push([curIndex]);
+      snapshots.push([...array]);
+      curIndex++;
     }
-  }
-  while (leftIndex < left.length) {
-    result[curIndex++] = left[leftIndex++];
-  }
-  while (rightIndex < right.length) {
-    result[curIndex++] = right[rightIndex++];
-  }
 
-  return result;
-}
+    while (leftIndex < leftArray.length) {
+      array[curIndex] = leftArray[leftIndex++];
+      result.push(array[curIndex]);
+      highlights.push([curIndex]);
+      snapshots.push([...array]);
+      curIndex++;
+    }
+
+    while (rightIndex < rightArray.length) {
+      array[curIndex] = rightArray[rightIndex++];
+      result.push(array[curIndex]);
+      highlights.push([curIndex]);
+      snapshots.push([...array]);
+      curIndex++;
+    }
+
+    return result;
+  };
+
+  mergeSortHelper(0, array.length - 1);
+
+  return { array, snapshots, highlights };
+};

@@ -1,19 +1,22 @@
 import { useEffect, useState } from "react";
-import { cn, generateArray } from "@/lib/utils";
 import { Bar } from "@/components/bar";
 import { Toolbar } from "@/components/toolbar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { IndexIndicator } from "@/components/index-indicator";
-import useSorting from "./hooks/use-sorting";
+import { cn, generateArray } from "@/lib/utils";
+import { sortOptions } from "@/data";
+import useSorting from "@/hooks/use-sorting";
 
 function App() {
-  const [arraySize, setArraySize] = useState(10);
+  const [selectedSort, setSelectedSort] = useState(sortOptions[0].value);
+  const [arraySize, setArraySize] = useState(50);
   const [array, setArray] = useState(generateArray(arraySize));
   const [speed, setSpeed] = useState("1");
 
-  const { sort, arraySnapshot, evaluations, highlights, playback } = useSorting(
+  const { sort, arraySnapshot, highlights, playback } = useSorting(
     array,
-    30 * Number(speed)
+    selectedSort,
+    Number(speed)
   );
 
   useEffect(() => {
@@ -34,12 +37,14 @@ function App() {
         setArraySize={setArraySize}
         speed={speed}
         setSpeed={setSpeed}
+        selectedSort={selectedSort}
+        setSelectedSort={setSelectedSort}
       />
       <section className="w-full flex-1 flex flex-col gap-2 p-4">
         <TooltipProvider>
           <div className={cn("w-full flex-1 flex items-end gap-1")}>
             {arraySnapshot.map((value, index) => {
-              const hasBeenHighlighted = sort.indices.highlights
+              const hasBeenHighlighted = sort?.highlights
                 .filter((_, index) => index <= playback.index)
                 .flat()
                 .includes(index);
@@ -50,7 +55,6 @@ function App() {
                   value={value}
                   height={(value / maxValue) * 100}
                   isCorrect={value === index + 1 && hasBeenHighlighted}
-                  isEvaluated={evaluations.includes(index)}
                   isHighlighted={highlights.includes(index)}
                 />
               );
@@ -58,21 +62,9 @@ function App() {
           </div>
         </TooltipProvider>
         <div className="relative h-5 w-full">
-          <div>
-            {evaluations.map((value) => (
-              <IndexIndicator
-                key={value}
-                index={value}
-                arraySize={arraySize}
-                className={"opacity-50 transition-none"}
-              />
-            ))}
-          </div>
-          <div>
-            {highlights.map((value) => (
-              <IndexIndicator key={value} index={value} arraySize={arraySize} />
-            ))}
-          </div>
+          {highlights.map((value) => (
+            <IndexIndicator key={value} index={value} arraySize={arraySize} />
+          ))}
         </div>
       </section>
     </main>
